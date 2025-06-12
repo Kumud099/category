@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: django-uv-app
+    env: docker
+    plan: free
+    branch: main
+    dockerContext: .
+    buildCommand: ""
+    startCommand: >
+      uv run gunicorn core.wsgi:application
+      --bind 0.0.0.0:8000
+      --workers 3
+      --timeout 120
+      --log-level info
+    envVars:
+      - key: DEBUG
+        value: False
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DB_NAME
+        fromDatabase:
+            name: django-db
+            property: database
+      - key: DB_USER
+        fromDatabase:
+            name: django-db
+            property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+            name: django-db
+            property: password
+      - key: DB_HOST
+        fromDatabase:
+            name: django-db
+            property: host
+      - key: DB_PORT
+        fromDatabase:
+            name: django-db
+            property: port
+
+databases:
+  - name: django-db
+    plan: free
