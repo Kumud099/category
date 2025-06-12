@@ -1,0 +1,46 @@
+services:
+  postgres:
+    restart: unless-stopped
+    image: postgres:alpine
+    # ports:
+    #   - "5432:5432"
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - network
+
+  web:
+    restart: unless-stopped
+    entrypoint: "/app/entrypoint.sh"
+    build:
+      context: .
+    command: [ "uv", "run", "gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "${GUNICORN_WORKERS}", "--timeout", "${GUNICORN_TIMEOUT}", "--log-level", "info", "--reload" ]
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    depends_on:
+      - postgres
+    networks:
+      - network
+
+volumes:
+  pg_data:
+  static_volume:
+  media_volume:
+
+networks:
+  network:
+    driver: bridge
+    name: network

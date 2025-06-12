@@ -13,10 +13,13 @@ dependencies = [
     "djangorestframework>=3.16.0",
     "djangorestframework-stubs>=3.16.0",
     "drf-nested-routers>=0.94.2",
+    "gunicorn>=23.0.0",
     "pillow>=11.2.1",
     "psycopg2-binary>=2.9.10",
     "python-decouple>=3.8",
+    "python-dotenv>=1.1.0",
     "requests>=2.32.4",
+    "whitenoise>=6.9.0",
 ]
 
 [dependency-groups]
